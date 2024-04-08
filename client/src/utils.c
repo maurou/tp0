@@ -28,11 +28,23 @@ int crear_conexion(char *ip, char* puerto)
 
 	getaddrinfo(ip, puerto, &hints, &server_info);
 
-	// Ahora vamos a crear el socket.
+	// Crear el socket
 	int socket_cliente = 0;
 
-	// Ahora que tenemos el socket, vamos a conectarlo
+	socket_cliente = socket(AF_INET, SOCK_STREAM, 0);
+    if (socket_cliente == -1) {
+        perror("Error al crear el socket");
+        return -1;
+    }
 
+    // Conectar el socket
+    int status = connect(socket_cliente, server_info->ai_addr, server_info->ai_addrlen);
+    if (status == -1) {
+        perror("Error al conectar");
+        close(socket_cliente);
+        freeaddrinfo(server_info);
+        return -1;
+    }
 
 	freeaddrinfo(server_info);
 
