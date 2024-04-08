@@ -34,8 +34,18 @@ int iniciar_servidor(void)
 
 int esperar_cliente(int socket_servidor)
 {
-	// Aceptamos un nuevo cliente
 	int socket_cliente;
+
+	struct sockaddr_in dir_cliente;
+
+    socklen_t tamanio_dir_cliente = sizeof(dir_cliente);
+
+	// Aceptamos un nuevo cliente
+	socket_cliente = accept(socket_servidor, (struct sockaddr *)&dir_cliente, &tamanio_dir_cliente);
+	if (socket_cliente == -1) {
+        log_error(logger, "Error al aceptar la conexión del cliente");
+        exit(EXIT_FAILURE);
+    }
 	log_info(logger, "Se conecto un cliente!");
 
 	return socket_cliente;
