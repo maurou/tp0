@@ -1,5 +1,10 @@
 #include "client.h"
 
+// Declaración de la función loggear_config
+void loggear_config(t_config* config, t_log* logger, char* ip, char* puerto, char* valor);
+
+void leer_config(t_config* config, char** ip, char** puerto, char** valor);
+
 int main(void)
 {
 	/*---------------------------------------------------PARTE 2-------------------------------------------------------------*/
@@ -23,13 +28,16 @@ int main(void)
 	// Usando el config creado previamente, leemos los valores del config y los 
 	// dejamos en las variables 'ip', 'puerto' y 'valor'
 	leer_config(config, &ip, &puerto, &valor);
+	log_info(logger, "Config leido.");
 
 	// Loggeamos el valor de config
 	loggear_config(config, logger, ip, puerto, valor);
+	log_info(logger, "Config loggeado.");
 
 	/* ---------------- LEER DE CONSOLA ---------------- */
 
 	leer_consola(logger);
+	log_info(logger, "Consola leida.");
 
 	/*---------------------------------------------------PARTE 3-------------------------------------------------------------*/
 
@@ -37,9 +45,14 @@ int main(void)
 
 	// Creamos una conexión hacia el servidor
 	conexion = crear_conexion(ip, puerto);
+	if (!conexion) {
+			log_error(logger, "Error al crear la conexion");
+			exit(1);
+		}
 
 	// Enviamos al servidor el valor de CLAVE como mensaje
 	enviar_mensaje(valor, conexion);
+	log_info(logger, "Mensaje enviado al servidor.");
 
 	// Armamos y enviamos el paquete
 	paquete(conexion);
@@ -89,11 +102,13 @@ void leer_consola(t_log* logger)
     while (strcmp(leido, "") == 0) {
 		printf("%s\n", leido);
 
-		log_info(logger, leido);
+		log_info(logger, "%s", leido);
 	}
 
 	// Liberar las lineas antes de regresar
 	free(leido);
+
+	return;
 }
 
 void paquete(int conexion)
@@ -124,6 +139,8 @@ void paquete(int conexion)
 	free(leido);
 
 	eliminar_paquete(paquete);
+
+	return;
 }
 
 void terminar_programa(int conexion, t_log* logger, t_config* config)
@@ -159,6 +176,8 @@ void leer_config(t_config* config, char** ip, char** puerto, char** valor) {
         printf("Error al obtener el valor de VALOR/CLAVE del config.\n");
         exit(1);
     }
+
+	return;
 }
 
 void loggear_config(t_config* config, t_log* logger, char* ip, char* puerto, char* valor)
@@ -173,4 +192,6 @@ void loggear_config(t_config* config, t_log* logger, char* ip, char* puerto, cha
 	log_info(logger, "IP: %s", ip);
     log_info(logger, "Puerto: %s", puerto);
     log_info(logger, "Valor/Clave: %s", valor);
+
+	return;
 }
