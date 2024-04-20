@@ -1,9 +1,9 @@
 #include "client.h"
 
 // Declaración de la función loggear_config
-void loggear_config(t_config* config, t_log* logger, char* ip, char* puerto, char* valor);
+/*void loggear_config(t_config* config, t_log* logger, char* ip, char* puerto, char* valor);
 
-void leer_config(t_config* config, char** ip, char** puerto, char** valor);
+void leer_config(t_config* config, char** ip, char** puerto, char** valor);*/
 
 int main(void)
 {
@@ -52,14 +52,15 @@ int main(void)
 	// ADVERTENCIA: Antes de continuar, tenemos que asegurarnos que el servidor esté corriendo para poder conectarnos a él
 
 	// Creamos una conexión hacia el servidor
-	/*conexion = crear_conexion(ip, puerto);
+	conexion = crear_conexion(ip, puerto);
 	if (!conexion) {
 			log_error(logger, "Error al crear la conexion");
 			exit(EXIT_FAILURE);
-		}*/
+	}
 
 	// Enviamos al servidor el valor de CLAVE como mensaje
 	enviar_mensaje(valor, conexion);
+
 	//log_info(logger, "Mensaje enviado al servidor.");
 
 	// Armamos y enviamos el paquete
@@ -75,13 +76,13 @@ t_log* iniciar_logger(void)
 {
 	t_log* nuevo_logger;
 
-	nuevo_logger = log_create("tp0.log", "tp0", 1, LOG_LEVEL_INFO);	
+	nuevo_logger = log_create("tp0.log", "client_log", 1, LOG_LEVEL_INFO);	
 	if (nuevo_logger == NULL) {
 		printf("Error al crear el logger.\n");
         exit(EXIT_FAILURE);
     }
 
-	log_info(nuevo_logger, "Soy un Log");
+	//log_info(nuevo_logger, "Soy un Log");
 
 	return nuevo_logger;
 }
@@ -106,7 +107,7 @@ void leer_consola(t_log* logger)
 	// Primera linea
 	leido = readline("> ");
 
-	log_info(logger, "%s", leido);
+	//log_info(logger, "%s", leido);
 
 	// El resto, las vamos leyendo y logueando hasta recibir un string vacío
     while (strcmp(leido, "") != 0) {
@@ -130,17 +131,19 @@ void paquete(int conexion)
 	leido = readline("> ");
 
 	paquete = crear_paquete();
-	/*if (paquete == NULL) {
+	if (paquete == NULL) {
         printf("Error al crear el paquete.\n");
         exit(1);
-    }*/
+    }
+
+	agregar_a_paquete(paquete, leido, strlen(leido) + 1);
 
     while (strcmp(leido, "") != 0) {
 		//printf("%s\n", leido);
 
-		agregar_a_paquete(paquete, leido, strlen(leido) + 1);
-
 		leido = readline("> ");
+
+		agregar_a_paquete(paquete, leido, strlen(leido) + 1);
 	}
 
 	enviar_paquete(paquete, conexion);
