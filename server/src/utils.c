@@ -1,7 +1,5 @@
 #include"utils.h"
 
-#define QUEUE 10 // Numero maximo de conexiones que se pueden recibir en cola
-
 t_log* logger;
 
 int iniciar_servidor(void)
@@ -18,13 +16,15 @@ int iniciar_servidor(void)
 	getaddrinfo(NULL, PUERTO, &hints, &servinfo);
 
 	// Creamos el socket de escucha del servidor
-	socket_servidor = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol);
+	socket_servidor = socket(serverinfo->ai_family,
+                        serverinfo->ai_socktype,
+                        serverinfo->ai_protocol);
 
 	// Asociamos el socket a un puerto
 	bind(socket_servidor, servinfo->ai_addr, servinfo->ai_addrlen);
 
 	// Escuchamos las conexiones entrantes
-	listen(socket_servidor, QUEUE);
+	listen(socket_servidor, SOMAXCONN);
 
 	freeaddrinfo(servinfo);
 	log_trace(logger, "Listo para escuchar a mi cliente");
@@ -34,18 +34,19 @@ int iniciar_servidor(void)
 
 int esperar_cliente(int socket_servidor)
 {
-	int socket_cliente;
+	/*int socket_cliente;
 
 	struct sockaddr_in dir_cliente;
 
-    socklen_t tamanio_dir_cliente = sizeof(dir_cliente);
+    socklen_t tamanio_dir_cliente = sizeof(dir_cliente);*/
 
 	// Aceptamos un nuevo cliente
-	socket_cliente = accept(socket_servidor, (struct sockaddr *)&dir_cliente, &tamanio_dir_cliente);
+	int socket_cliente = accept(socket_servidor, NULL, NULL);
+	/*socket_cliente = accept(socket_servidor, (struct sockaddr *)&dir_cliente, &tamanio_dir_cliente);
 	if (socket_cliente == -1) {
         log_error(logger, "Error al aceptar la conexión del cliente");
         exit(EXIT_FAILURE);
-    }
+    }*/
 	log_info(logger, "Se conecto un cliente!");
 
 	return socket_cliente;

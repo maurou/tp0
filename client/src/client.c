@@ -21,38 +21,46 @@ int main(void)
 
 	logger = iniciar_logger();
 
+	log_info(logger, "Soy un Log");
+
 	/* ---------------- ARCHIVOS DE CONFIGURACION ---------------- */
 
 	config = iniciar_config();
 
 	// Usando el config creado previamente, leemos los valores del config y los 
 	// dejamos en las variables 'ip', 'puerto' y 'valor'
-	leer_config(config, &ip, &puerto, &valor);
-	log_info(logger, "Config leido.");
+	ip = config_get_string_value(config, "IP");
+    puerto = config_get_string_value(config, "PUERTO");
+	valor = config_get_string_value(config, "CLAVE");
+
+	//leer_config(config, &ip, &puerto, &valor);
+	//log_info(logger, "Config leido.");
 
 	// Loggeamos el valor de config
-	loggear_config(config, logger, ip, puerto, valor);
-	log_info(logger, "Config loggeado.");
+	log_info(logger, "Valor de la config: %s", valor);
+
+	//loggear_config(config, logger, ip, puerto, valor);
+	//log_info(logger, "Config loggeado.");
 
 	/* ---------------- LEER DE CONSOLA ---------------- */
 
 	leer_consola(logger);
-	log_info(logger, "Consola leida.");
+	//log_info(logger, "Consola leida.");
 
 	/*---------------------------------------------------PARTE 3-------------------------------------------------------------*/
 
 	// ADVERTENCIA: Antes de continuar, tenemos que asegurarnos que el servidor esté corriendo para poder conectarnos a él
 
 	// Creamos una conexión hacia el servidor
-	conexion = crear_conexion(ip, puerto);
+	/*conexion = crear_conexion(ip, puerto);
 	if (!conexion) {
 			log_error(logger, "Error al crear la conexion");
-			exit(1);
-		}
+			exit(EXIT_FAILURE);
+		}*/
 
 	// Enviamos al servidor el valor de CLAVE como mensaje
 	enviar_mensaje(valor, conexion);
-	log_info(logger, "Mensaje enviado al servidor.");
+	//log_info(logger, "Mensaje enviado al servidor.");
 
 	// Armamos y enviamos el paquete
 	paquete(conexion);
@@ -70,7 +78,7 @@ t_log* iniciar_logger(void)
 	nuevo_logger = log_create("tp0.log", "tp0", 1, LOG_LEVEL_INFO);	
 	if (nuevo_logger == NULL) {
 		printf("Error al crear el logger.\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
 	log_info(nuevo_logger, "Soy un Log");
@@ -85,7 +93,7 @@ t_config* iniciar_config(void)
 	nuevo_config = config_create("cliente.config");
     if (nuevo_config == NULL) {
 		printf("Error al crear el config.\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
 	return nuevo_config;
@@ -98,17 +106,19 @@ void leer_consola(t_log* logger)
 	// Primera linea
 	leido = readline("> ");
 
-	// El resto, las vamos leyendo y logueando hasta recibir un string vacío
-    while (strcmp(leido, "") == 0) {
-		printf("%s\n", leido);
+	log_info(logger, "%s", leido);
 
+	// El resto, las vamos leyendo y logueando hasta recibir un string vacío
+    while (strcmp(leido, "") != 0) {
 		log_info(logger, "%s", leido);
+
+		leido = readline("> ");
 	}
 
 	// Liberar las lineas antes de regresar
 	free(leido);
 
-	return;
+	//return;
 }
 
 void paquete(int conexion)
@@ -120,17 +130,17 @@ void paquete(int conexion)
 	leido = readline("> ");
 
 	paquete = crear_paquete();
-	if (paquete == NULL) {
+	/*if (paquete == NULL) {
         printf("Error al crear el paquete.\n");
         exit(1);
-    }
+    }*/
 
-    while (strcmp(leido, "") == 0) {
-		printf("%s\n", leido);
+    while (strcmp(leido, "") != 0) {
+		//printf("%s\n", leido);
 
-		int tamanio = strlen(leido) + 1;
+		agregar_a_paquete(paquete, leido, strlen(leido) + 1);
 
-		agregar_a_paquete(paquete, leido, tamanio);
+		leido = readline("> ");
 	}
 
 	enviar_paquete(paquete, conexion);
@@ -140,7 +150,7 @@ void paquete(int conexion)
 
 	eliminar_paquete(paquete);
 
-	return;
+	//return;
 }
 
 void terminar_programa(int conexion, t_log* logger, t_config* config)
@@ -158,7 +168,7 @@ void terminar_programa(int conexion, t_log* logger, t_config* config)
 	liberar_conexion(conexion);
 }
 
-void leer_config(t_config* config, char** ip, char** puerto, char** valor) {
+/*void leer_config(t_config* config, char** ip, char** puerto, char** valor) {
     *ip = config_get_string_value(config, "IP");
     if (*ip == NULL) {
         printf("Error al obtener el valor de IP del config.\n");
@@ -194,4 +204,4 @@ void loggear_config(t_config* config, t_log* logger, char* ip, char* puerto, cha
     log_info(logger, "Valor/Clave: %s", valor);
 
 	return;
-}
+}*/
