@@ -113,8 +113,12 @@ void leer_consola(t_log* logger)
     while (strcmp(leido, "") != 0) {
 		log_info(logger, "%s", leido);
 
+		free(leido);
+
 		leido = readline("> ");
 	}
+
+	log_info(logger, "%s", leido);
 
 	// Liberar las lineas antes de regresar
 	free(leido);
@@ -136,15 +140,17 @@ void paquete(int conexion)
         exit(1);
     }
 
-	agregar_a_paquete(paquete, leido, strlen(leido) + 1);
-
     while (strcmp(leido, "") != 0) {
 		//printf("%s\n", leido);
 
-		leido = readline("> ");
-
 		agregar_a_paquete(paquete, leido, strlen(leido) + 1);
+
+		free(leido);
+
+		leido = readline("> ");
 	}
+
+	agregar_a_paquete(paquete, leido, strlen(leido) + 1);
 
 	enviar_paquete(paquete, conexion);
 
